@@ -4758,8 +4758,9 @@ namespace Catch {
 
 #ifdef CATCH_PLATFORM_MAC
 
-    #define CATCH_TRAP() __asm__("int $3\n" : : ) /* NOLINT */
-
+    //#define CATCH_TRAP() __asm__("int $3\n" : : ) /* NOLINT */
+    #define CATCH_TRAP() __builtin_debugtrap()
+    
 #elif defined(CATCH_PLATFORM_LINUX)
     // If we can use inline assembler, do it because this allows us to break
     // directly at the location of the failing check instead of breaking inside
@@ -5051,14 +5052,14 @@ namespace Catch {
 
     void AssertionHandler::complete() {
         setCompleted();
-        // if( m_reaction.shouldDebugBreak ) {
+        if( m_reaction.shouldDebugBreak ) {
 
-        //     // If you find your debugger stopping you here then go one level up on the
-        //     // call-stack for the code that caused it (typically a failed assertion)
+            // If you find your debugger stopping you here then go one level up on the
+            // call-stack for the code that caused it (typically a failed assertion)
 
-        //     // (To go back to the test and change execution, jump over the throw, next)
-        //     CATCH_BREAK_INTO_DEBUGGER();
-        // }
+            // (To go back to the test and change execution, jump over the throw, next)
+            CATCH_BREAK_INTO_DEBUGGER();
+        }
         if( m_reaction.shouldThrow )
             throw Catch::TestFailureException();
     }
